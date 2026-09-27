@@ -1,115 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Card Catalogue</title>
 
-    <title>🎴 Card Catalogue</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 30px;
+      background: #f2f2f2;
+      color: #222;
+    }
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #111;
-            color: #eee;
-        }
+    .card {
+      width: 300px;
+      margin: 0 auto;
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+      text-align: center;
+    }
 
-        header {
-            padding: 30px 20px;
-            text-align: center;
-            background: #1b1b1b;
-            border-bottom: 1px solid #333;
-        }
+    .card img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+    }
 
-        header h1 {
-            margin: 0;
-            font-size: 32px;
-        }
+    .card h2 {
+      margin: 15px 0 10px;
+    }
 
-        .catalogue {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .card {
-            width: 220px;
-            padding: 10px;
-            background: #1c1c1c;
-            border: 1px solid #444;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .card img {
-            display: block;
-            width: 100%;
-            aspect-ratio: 64 / 88;
-            object-fit: contain;
-            border-radius: 6px;
-            background: #222;
-        }
-
-        .card h2 {
-            font-size: 18px;
-            margin: 12px 0 4px;
-        }
-
-        .card p {
-            margin: 4px 0;
-            color: #aaa;
-            font-size: 14px;
-        }
-
-        .card a {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 9px 14px;
-            border-radius: 7px;
-            background: #333;
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .card a:hover {
-            background: #555;
-        }
-    </style>
+    .card a {
+      display: inline-block;
+      padding: 10px 18px;
+      background: #222;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-    <h1>🎴 Card Catalogue</h1>
-</header>
+  <h1>Card Catalogue</h1>
 
-<main class="catalogue">
+  <div class="card">
+    <img
+      src="https://raw.githubusercontent.com/godlesskoti/card-catalogue/main/previews/Ancestral%20Call.jpg"
+      alt="Ancestral Call"
+    >
 
-    <div class="card">
+    <h2>Ancestral Call</h2>
 
-        <img src="https://drive.google.com/uc?export=view&id=1UNtSBdXRkrLioqdV6YwGikGy9gTF0DD-" alt="Ancestral Call">
-
-        <h2>Ancestral Call</h2>
-
-        <p>Test card</p>
-
-        <a
-            href="https://drive.google.com/file/d/1QtBtP8LOyRDZTXnuFJwiZ0_u6kss0liE/view?usp=drive_link"
-            target="_blank"
-        >
-            📄 Download PDF
-        </a>
-
-    </div>
-
-</main>
+    <a
+      href="https://drive.google.com/file/d/1QtBtP8LOyRDZTXnuFJwiZ0_u6kss0liE/view"
+      target="_blank"
+    >
+      Open PDF
+    </a>
+  </div>
 
 </body>
 </html>
