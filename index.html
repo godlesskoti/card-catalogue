@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>🎴 Card Catalogue</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #111;
+            color: #eee;
+        }
+
+        header {
+            padding: 30px 20px 20px;
+            text-align: center;
+            background: #1b1b1b;
+            border-bottom: 1px solid #333;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+        }
+
+        header p {
+            margin: 0;
+            color: #aaa;
+        }
+
+        .controls {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .controls input,
+        .controls select {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #222;
+            color: #eee;
+            font-size: 15px;
+        }
+
+        .controls input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .catalogue {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 20px 40px;
+
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .card img {
+            width: 100%;
+            aspect-ratio: 64 / 88;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #222;
+        }
+
+        .card h2 {
+            font-size: 17px;
+            margin: 10px 0 5px;
+        }
+
+        .card p {
+            margin: 3px 0;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .card a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .card a:hover {
+            background: #555;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎴 Card Catalogue</h1>
+    <p>Search and browse the collection</p>
+</header>
+
+<div class="controls">
+
+    <input
+        type="text"
+        id="search"
+        placeholder="🔎 Search cards..."
+    >
+
+    <select id="faction">
+        <option value="">All factions</option>
+    </select>
+
+    <select id="category">
+        <option value="">All categories</option>
+    </select>
+
+</div>
+
+<main
+    class="catalogue"
+    id="catalogue"
+>
+    <div class="empty">
+        Loading catalogue...
+    </div>
+</main>
+
+
+<script>
+
+    /*
+     * TEMPORARY TEST DATA
+     *
+     * We'll replace this with your real
+     * card database later.
+     */
+
+    const cards = [
+        {
+            name: "Example Card",
+            faction: "Mordea",
+            category: "Spell",
+            preview: "",
+            pdf: ""
+        }
+    ];
+
+
+    const catalogue =
+        document.getElementById("catalogue");
+
+    const search =
+        document.getElementById("search");
+
+    const faction =
+        document.getElementById("faction");
+
+    const category =
+        document.getElementById("category");
+
+
+    function populateFilters() {
+
+        const factions =
+            [...new Set(
+                cards
+                    .map(card => card.faction)
+                    .filter(Boolean)
+            )]
+            .sort();
+
+        const categories =
+            [...new Set(
+                cards
+                    .map(card => card.category)
+                    .filter(Boolean)
+            )]
+            .sort();
+
+
+        factions.forEach(value => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = value;
+            option.textContent = value;
+
+            faction.appendChild(option);
+        });
+
+
+        categories.forEach(value => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = value;
+            option.textContent = value;
+
+            category.appendChild(option);
+        });
+    }
+
+
+    function displayCards() {
+
+        const searchText =
+            search.value
+                .toLowerCase()
+                .trim();
+
+        const selectedFaction =
+            faction.value;
+
+        const selectedCategory =
+            category.value;
+
+
+        const filtered =
+            cards.filter(card => {
+
+                const matchesSearch =
+                    card.name
+                        .toLowerCase()
+                        .includes(searchText);
+
+                const matchesFaction =
+                    !selectedFaction ||
+                    card.faction === selectedFaction;
+
+                const matchesCategory =
+                    !selectedCategory ||
+                    card.category === selectedCategory;
+
+                return (
+                    matchesSearch &&
+                    matchesFaction &&
+                    matchesCategory
+                );
+            });
+
+
+        catalogue.innerHTML = "";
+
+
+        if (filtered.length === 0) {
+
+            catalogue.innerHTML = `
+                <div class="empty">
+                    No cards found.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        filtered.forEach(card => {
+
+            const element =
+                document.createElement("div");
+
+            element.className = "card";
+
+
+            let image = "";
+
+            if (card.preview) {
+
+                image = `
+                    <img
+                        src="${card.preview}"
+                        alt="${card.name}"
+                    >
+                `;
+
+            } else {
+
+                image = `
+                    <div
+                        style="
+                            aspect-ratio: 64 / 88;
+                            background: #222;
+                            border-radius: 6px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: #666;
+                        "
+                    >
+                        No preview
+                    </div>
+                `;
+            }
+
+
+            let download = "";
+
+            if (card.pdf) {
+
+                download = `
+                    <a
+                        href="${card.pdf}"
+                        target="_blank"
+                    >
+                        📄 Download PDF
+                    </a>
+                `;
+            }
+
+
+            element.innerHTML = `
+                ${image}
+
+                <h2>
+                    ${card.name}
+                </h2>
+
+                <p>
+                    ${card.faction}
+                </p>
+
+                <p>
+                    ${card.category}
+                </p>
+
+                ${download}
+            `;
+
+
+            catalogue.appendChild(element);
+        });
+    }
+
+
+    search.addEventListener(
+        "input",
+        displayCards
+    );
+
+    faction.addEventListener(
+        "change",
+        displayCards
+    );
+
+    category.addEventListener(
+        "change",
+        displayCards
+    );
+
+
+    populateFilters();
+
+    displayCards();
+
+</script>
+
+</body>
+</html>
