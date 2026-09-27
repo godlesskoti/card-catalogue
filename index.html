@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Card Catalogue</title>
 
   <style>
@@ -68,11 +67,6 @@
       padding: 12px;
       box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
       text-align: center;
-      transition: transform 0.15s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
     }
 
     .card img {
@@ -115,42 +109,6 @@
       font-size: 18px;
       color: #666;
     }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 15px;
-      }
-
-      .controls input {
-        width: 100%;
-      }
-
-      .controls select {
-        width: 100%;
-      }
-
-      .catalogue {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .card {
-        padding: 8px;
-      }
-
-      .card h2 {
-        font-size: 15px;
-      }
-
-      .card-info {
-        font-size: 12px;
-      }
-
-      .download {
-        font-size: 12px;
-        padding: 8px 10px;
-      }
-    }
   </style>
 
 </head>
@@ -160,14 +118,13 @@
   <h1>Card Catalogue</h1>
 
   <div class="controls">
+    <input
+      type="text"
+      id="search"
+      placeholder="Search cards..."
+    >
 
 ```
-<input
-  type="text"
-  id="search"
-  placeholder="Search cards..."
->
-
 <select id="faction">
   <option value="">All factions</option>
 </select>
@@ -189,34 +146,38 @@
 
   <script>
 
+    const CARDS_URL =
+      "https://raw.githubusercontent.com/godlesskoti/card-catalogue/main/cards.json";
+
     const GITHUB_RAW =
       "https://raw.githubusercontent.com/godlesskoti/card-catalogue/main/";
 
-    const DRIVE_DOWNLOAD =
-      "https://drive.google.com/uc?export=download&id=";
-
-
     let cards = [];
 
-
-    // ============================================
-    // LOAD CARDS
-    // ============================================
 
     async function loadCards() {
 
       try {
 
-        const response = await fetch("cards.json");
+        const response = await fetch(
+          CARDS_URL + "?v=" + Date.now()
+        );
 
         if (!response.ok) {
-          throw new Error("Could not load cards.json");
+          throw new Error(
+            "HTTP " + response.status
+          );
         }
 
         cards = await response.json();
 
-        setupFilters();
+        if (!Array.isArray(cards)) {
+          throw new Error(
+            "cards.json is not an array"
+          );
+        }
 
+        setupFilters();
         displayCards();
 
       } catch (error) {
@@ -224,19 +185,15 @@
         console.error(error);
 
         document.getElementById("results").textContent =
-          "Could not load the card catalogue.";
+          "Could not load cards.json.";
 
         document.getElementById("message").textContent =
-          "Make sure cards.json is in the main GitHub repository folder.";
+          "Error: " + error.message;
 
       }
 
     }
 
-
-    // ============================================
-    // FILTER SETUP
-    // ============================================
 
     function setupFilters() {
 
@@ -254,7 +211,6 @@
         }
 
       });
-
 
       const factionSelect =
         document.getElementById("faction");
@@ -294,10 +250,6 @@
     }
 
 
-    // ============================================
-    // DISPLAY CARDS
-    // ============================================
-
     function displayCards() {
 
       const catalogue =
@@ -308,7 +260,6 @@
 
       const results =
         document.getElementById("results");
-
 
       catalogue.innerHTML = "";
       message.textContent = "";
@@ -325,3 +276,167 @@
       const selectedFaction =
         document
           .getElementById("faction")
+          .value;
+
+
+      const selectedCategory =
+        document
+          .getElementById("category")
+          .value;
+
+
+      const filtered =
+        cards.filter(card => {
+
+          if (!card.preview) {
+            return false;
+          }
+
+          const searchableText = [
+            card.name,
+            card.faction,
+            card.colour1,
+            card.colour2,
+            card.category,
+            card.cost,
+            card.text
+          ]
+          .join(" ")
+          .toLowerCase();
+
+
+          if (
+            search &&
+            !searchableText.includes(search)
+          ) {
+            return false;
+          }
+
+
+          if (
+            selectedFaction &&
+            card.faction !== selectedFaction
+          ) {
+            return false;
+          }
+
+
+          if (
+            selectedCategory &&
+            card.category !== selectedCategory
+          ) {
+            return false;
+          }
+
+
+          return true;
+
+        });
+
+
+      results.textContent =
+        `Showing ${filtered.length} of ${cards.length} cards`;
+
+
+      if (filtered.length === 0) {
+
+        message.textContent =
+          "No cards with previews match your search.";
+
+        return;
+
+      }
+
+
+      filtered.forEach(card => {
+
+        const cardElement =
+          document.createElement("div");
+
+        cardElement.className = "card";
+
+
+        const image =
+          document.createElement("img");
+
+        image.src =
+          GITHUB_RAW +
+          card.preview
+            .split("/")
+            .map(part => encodeURIComponent(part))
+            .join("/");
+
+        image.alt = card.name;
+        image.loading = "lazy";
+
+
+        const title =
+          document.createElement("h2");
+
+        title.textContent = card.name;
+
+
+        const info =
+          document.createElement("div");
+
+        info.className = "card-info";
+
+        const details = [];
+
+        if (card.faction) {
+          details.push(card.faction);
+        }
+
+        if (card.category) {
+          details.push(card.category);
+        }
+
+        if (card.cost) {
+          details.push(card.cost);
+        }
+
+        info.textContent =
+          details.join(" • ");
+
+
+        cardElement.appendChild(image);
+        cardElement.appendChild(title);
+        cardElement.appendChild(info);
+
+        catalogue.appendChild(cardElement);
+
+      });
+
+    }
+
+
+    document
+      .getElementById("search")
+      .addEventListener(
+        "input",
+        displayCards
+      );
+
+
+    document
+      .getElementById("faction")
+      .addEventListener(
+        "change",
+        displayCards
+      );
+
+
+    document
+      .getElementById("category")
+      .addEventListener(
+        "change",
+        displayCards
+      );
+
+
+    loadCards();
+
+  </script>
+
+</body>
+</html>
